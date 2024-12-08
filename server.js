@@ -72,7 +72,7 @@ app.get('/jobs/paginated', async (req, res) => {
     const limit = 5;
     const skip = (page - 1) * limit;
 
-    const jobs = await Job.find().skip(skip).limit(limit);
+    const jobs = await Job.find().sort({ _id: -1 }).skip(skip).limit(limit);
     res.json({ total, jobs });
   } catch {
     res.status(500).json({ error: 'Failed to fetch jobs' });
