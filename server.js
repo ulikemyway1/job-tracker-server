@@ -4,17 +4,14 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const Job = require('./models/Job');
 
-
 const app = express();
 app.use(cors());
 app.use(express.json());
-
 
 const mongooseOptions = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 };
-
 
 mongoose.connect(process.env.MONGODB_URI, mongooseOptions)
   .then(() => {
@@ -67,3 +64,18 @@ app.delete('/jobs/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to delete job' });
   }
 });
+
+app.get('/jobs/paginated', async (req, res) => {
+  try {
+    const total = await Job.countDocuments();
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5;
+    const skip = (page - 1) * limit;
+
+    const jobs = await Job.find().skip(skip).limit(limit);
+    res.json({ total, jobs });
+  } catch {
+    res.status(500).json({ error: 'Failed to fetch jobs' });
+  }
+});
+
